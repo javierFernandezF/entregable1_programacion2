@@ -15,13 +15,6 @@ public class Sistema {
         this.scanner = new Scanner(System.in);
     }
     
-  
-    
-    public static void main(String[] args) {
-        Sistema sistema = new Sistema();
-        sistema.iniciar();
-    }
-    
     public void iniciar() {
         System.out.println("=== BIENVENIDO A MEDIO TATETI ===");
         
