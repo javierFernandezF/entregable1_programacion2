@@ -24,24 +24,15 @@ public class Sistema {
             int opcion = leerOpcion();
             
             switch (opcion) {
-                case 1:
-                    registrarJugador();
-                    break;
-                case 2:
-                    iniciarPartidaComun();
-                    break;
-                case 3:
-                    continuarPartida();
-                    break;
-                case 4:
-                    mostrarRankingEInvictos();
-                    break;
-                case 0:
+                case 1 -> registrarJugador();
+                case 2 -> iniciarPartidaComun();
+                case 3 -> continuarPartida();
+                case 4 -> mostrarRankingEInvictos();
+                case 0 -> {
                     continuar = false;
                     System.out.println("¡Gracias por jugar Medio Tateti!");
-                    break;
-                default:
-                    System.out.println("Opción inválida. Intente nuevamente.");
+                }
+                default -> System.out.println("Opción inválida. Intente nuevamente.");
             }
             
             if (continuar) {
@@ -63,46 +54,32 @@ public class Sistema {
     
     private int leerOpcion() {
         String input = scanner.nextLine();
+        int opcion;
         
-        // Validar que sea un solo dígito
-        if (input.length() == 1 && input.charAt(0) >= '0' && input.charAt(0) <= '9') {
-            return input.charAt(0) - '0';
-        }
-        
-        return -1; // Opción inválida
-    }
-    
-    // Validar que un string sea un número positivo
-    private int validarNumeroPositivo(String input) {
-        if (input.isEmpty()) {
-            return -1;
-        }
-        
-        // Verificar que todos los caracteres sean dígitos
-        for (int i = 0; i < input.length(); i++) {
-            if (input.charAt(i) < '0' || input.charAt(i) > '9') {
-                return -1;
-            }
-        }
-        
-        // Convertir a número manualmente
-        int numero = 0;
-        for (int i = 0; i < input.length(); i++) {
-            numero = numero * 10 + (input.charAt(i) - '0');
-        }
-        
-        if (numero > 0) {
-            return numero;
+        // Validar que sea un solo dígito y usar switch case
+        if (input.length() == 1) {
+            char caracter = input.charAt(0);
+            
+            opcion = switch (caracter) {
+                case '0' -> 0;
+                case '1' -> 1;
+                case '2' -> 2;
+                case '3' -> 3;
+                case '4' -> 4;
+                default -> -1;
+            };
         } else {
-            return -1;
+            opcion = -1; 
         }
+        
+        return opcion;
     }
     
     private void registrarJugador() {
         System.out.println("\n=== REGISTRAR JUGADOR ===");
         
         System.out.println("Ingrese el nombre del jugador: ");
-        String nombre = scanner.nextLine().trim();
+        String nombre = scanner.nextLine();
         
         if (nombre.isEmpty()) {
             System.out.println("El nombre no puede estar vacío.");
@@ -115,14 +92,10 @@ public class Sistema {
         }
         
         System.out.println("Ingrese la edad del jugador: ");
-        String edadInput = scanner.nextLine().trim();
+        String edadInput = scanner.nextLine();
         
-        // Validar que sea un número positivo
-        int edad = validarNumeroPositivo(edadInput);
-        if (edad == -1) {
-            System.out.println("La edad debe ser un número válido y positivo.");
-            return;
-        }
+        // Convertir a número sin validación (0 si no es número válido)
+        int edad = Integer.parseInt(edadInput);
         
         if (gestorJugadores.registrarJugador(nombre, edad)) {
             System.out.println("Jugador registrado exitosamente: " + nombre + " (Edad: " + edad + ")");
@@ -130,6 +103,7 @@ public class Sistema {
             System.out.println("Error al registrar el jugador.");
         }
     }
+    
     
     private void iniciarPartidaComun() {
         System.out.println("\n=== COMIENZO DE PARTIDA COMÚN ===");
@@ -176,10 +150,10 @@ public class Sistema {
             return;
         }
         
-        // Mostrar lista de jugadores
+     
         gestorJugadores.mostrarListaJugadores();
         
-        // Seleccionar jugadores
+        
         Jugador jugador1 = seleccionarJugador("Seleccione el jugador 1 (Blanco - O): ");
         if (jugador1 == null) return;
         
@@ -194,9 +168,9 @@ public class Sistema {
             }
         } while (jugador2 == null);
         
-        // Solicitar secuencia de movimientos
+
         System.out.print("Ingrese la secuencia de movimientos (ej: A1C B3D C2C): ");
-        String secuencia = scanner.nextLine().trim();
+        String secuencia = scanner.nextLine();
         
         if (secuencia.isEmpty()) {
             System.out.println("Debe ingresar una secuencia de movimientos.");
@@ -205,6 +179,7 @@ public class Sistema {
         
         
         // Iniciar partida con secuencia
+
         PartidaSimple juego = new PartidaSimple(jugador1, jugador2);
         char resultado = juego.continuarPartida(secuencia);
         
@@ -214,21 +189,14 @@ public class Sistema {
     
     private Jugador seleccionarJugador(String mensaje) {
         System.out.print(mensaje);
-        String input = scanner.nextLine().trim();
+        String input = scanner.nextLine();
         
-        // Validar que sea un número positivo
-        int numero = validarNumeroPositivo(input);
-        if (numero == -1) {
-            System.out.println("Debe ingresar un número válido.");
-            return null;
-        }
-        
+        int numero = Integer.parseInt(input);
         ArrayList<Jugador> jugadoresOrdenados = gestorJugadores.obtenerJugadoresOrdenados();
         
         if (numero >= 1 && numero <= jugadoresOrdenados.size()) {
             return jugadoresOrdenados.get(numero - 1);
         } else {
-            System.out.println("Número de jugador inválido.");
             return null;
         }
     }
@@ -243,7 +211,6 @@ public class Sistema {
             jugador2.incrementarPartidasGanadas();
             jugador1.incrementarPartidasPerdidas();
         }
-        //Si empatan no se actualizan las estadisticas
     }
     
     private void mostrarRankingEInvictos() {

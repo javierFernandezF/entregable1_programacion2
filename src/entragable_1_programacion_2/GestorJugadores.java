@@ -10,10 +10,10 @@ public class GestorJugadores {
     private ArrayList<Jugador> jugadores;
     
     public GestorJugadores() {
-        this.jugadores = new ArrayList<>();
+        this.jugadores = new ArrayList<Jugador>();
     }
     
-    // Registrar un nuevo jugador
+    
     public boolean registrarJugador(String nombre, int edad) {
         if (existeJugador(nombre)) {
             return false; 
@@ -23,11 +23,9 @@ public class GestorJugadores {
         jugadores.add(nuevoJugador);
         return true;
     }
-    
-    // Verificar si existe un jugador con ese nombre
     public boolean existeJugador(String nombre) {
-        for (Jugador jugador : jugadores) {
-            if (jugador.getNombre().equalsIgnoreCase(nombre)) {
+        for (int i = 0; i < jugadores.size(); i++) {
+            if (jugadores.get(i).getNombre().equalsIgnoreCase(nombre)) {
                 return true;
             }
         }
@@ -35,17 +33,10 @@ public class GestorJugadores {
     }
     
     public Jugador obtenerJugador(String nombre) {
-        for (Jugador jugador : jugadores) {
-            if (jugador.getNombre().equalsIgnoreCase(nombre)) {
-                return jugador;
+        for (int i = 0; i < jugadores.size(); i++) {
+            if (jugadores.get(i).getNombre().equalsIgnoreCase(nombre)) {
+                return jugadores.get(i);
             }
-        }
-        return null;
-    }
-    
-    public Jugador obtenerJugadorPorIndice(int indice) {
-        if (indice >= 0 && indice < jugadores.size()) {
-            return jugadores.get(indice);
         }
         return null;
     }
@@ -79,6 +70,8 @@ public class GestorJugadores {
         }
         
         System.out.println("=== LISTA DE JUGADORES ===");
+
+
         for (int i = 0; i < jugadoresOrdenados.size(); i++) {
             Jugador jugador = jugadoresOrdenados.get(i);
             System.out.println((i + 1) + ". " + jugador.getNombre() + 
@@ -89,21 +82,39 @@ public class GestorJugadores {
         System.out.println("==========================");
     }
     
-    public ArrayList<Jugador> obtenerRanking() {
+    
+    // Mostrar ranking
+    public void mostrarRanking() {
+        if (jugadores.isEmpty()) {
+            System.out.println("No hay jugadores registrados.");
+            return;
+        }
+        
         ArrayList<Jugador> ranking = new ArrayList<>(jugadores);
         Collections.sort(ranking);
-        return ranking;
+        
+        System.out.println("=== RANKING DE JUGADORES ===");
+        for (int i = 0; i < ranking.size(); i++) {
+            Jugador jugador = ranking.get(i);
+            System.out.println((i + 1) + ". " + jugador.getNombre() + 
+                             " - " + jugador.getPartidasGanadas() + " partidas ganadas");
+        }
+        System.out.println("============================");
     }
     
-    // Obtener jugadores invictos (nunca jugaron o nunca perdieron)
-    public ArrayList<Jugador> obtenerJugadoresInvictos() {
+    // Mostrar jugadores invictos
+    public void mostrarJugadoresInvictos() {
         ArrayList<Jugador> invictos = new ArrayList<>();
         
         for (int i = 0; i < jugadores.size(); i++) {
-            // Invicto: nunca jugó o nunca perdió
             if (jugadores.get(i).getPartidasPerdidas() == 0) {
                 invictos.add(jugadores.get(i));
             }
+        }
+        
+        if (invictos.isEmpty()) {
+            System.out.println("No hay jugadores invictos.");
+            return;
         }
         
         for (int i = 0; i < invictos.size() - 1; i++) {
@@ -118,36 +129,6 @@ public class GestorJugadores {
                     invictos.set(j + 1, temp);
                 }
             }
-        }
-        
-        return invictos;
-    }
-    
-    // Mostrar ranking
-    public void mostrarRanking() {
-        ArrayList<Jugador> ranking = obtenerRanking();
-        
-        if (ranking.isEmpty()) {
-            System.out.println("No hay jugadores registrados.");
-            return;
-        }
-        
-        System.out.println("=== RANKING DE JUGADORES ===");
-        for (int i = 0; i < ranking.size(); i++) {
-            Jugador jugador = ranking.get(i);
-            System.out.println((i + 1) + ". " + jugador.getNombre() + 
-                             " - " + jugador.getPartidasGanadas() + " partidas ganadas");
-        }
-        System.out.println("============================");
-    }
-    
-    // Mostrar jugadores invictos
-    public void mostrarJugadoresInvictos() {
-        ArrayList<Jugador> invictos = obtenerJugadoresInvictos();
-        
-        if (invictos.isEmpty()) {
-            System.out.println("No hay jugadores invictos.");
-            return;
         }
         
         System.out.println("=== JUGADORES INVICTOS ===");

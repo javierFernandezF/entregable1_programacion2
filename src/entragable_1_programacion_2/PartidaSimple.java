@@ -8,38 +8,37 @@ import java.util.*;
 
 public class PartidaSimple {
     // Atributos del tablero
-    private char[][] tablero;
+    private final char[][] tablero;
     private boolean mostrarTitulos;
-    private List<int[]> posicionesLineaGanadora;
+    private final List<int[]> posicionesLineaGanadora;
     
     // Atributos de la partida
     private Jugador jugador1;
     private Jugador jugador2;
     private Jugador jugadorActual;
-    private char simboloJugador1;
-    private char simboloJugador2;
-    private Scanner scanner;
+    private final char simboloJugador1;
+    private final char simboloJugador2;
+    private final Scanner scanner;
     private boolean juegoTerminado;
     
-    public PartidaSimple() {
-        // Inicializar tablero
+    
+    public PartidaSimple(Jugador jugador1, Jugador jugador2) {
+        // Inicializar tablero (duplicado del constructor vacío)
         this.tablero = new char[3][6];
         this.mostrarTitulos = true;
         this.posicionesLineaGanadora = new ArrayList<>();
         inicializarTablero();
         
-        // Inicializar partida
+        // Inicializar partida (duplicado del constructor vacío)
         this.scanner = new Scanner(System.in);
         this.juegoTerminado = false;
-    }
-    
-    public PartidaSimple(Jugador jugador1, Jugador jugador2) {
-        this();
+        
+        // Inicializar jugadores específicos
         this.jugador1 = jugador1;
         this.jugador2 = jugador2;
         this.jugadorActual = jugador1;
-        this.simboloJugador1 = 'X';  
-        this.simboloJugador2 = 'O';  
+        this.simboloJugador1 = 'O';  
+        this.simboloJugador2 = 'X';   
     }
     
     // Método para obtener el símbolo de un jugador en esta partida
@@ -81,7 +80,7 @@ public class PartidaSimple {
         return true;
     }
     
-    public boolean invertirPieza(int fila, int columna) {
+    public boolean invertirPieza(int fila, int columna, char jugador) {
         if (fila < 0 || fila > 2 || columna < 0 || columna > 5) {
             return false;
         }
@@ -91,12 +90,30 @@ public class PartidaSimple {
             return false;
         }
         
+        // Verificar que la pieza pertenece al jugador actual
+        boolean esPiezaDelJugador = false;
+        if (jugador == 'X') {
+            // Jugador X tiene piezas en mayúsculas (C, D)
+            esPiezaDelJugador = (piezaActual == 'C' || piezaActual == 'D');
+        } else if (jugador == 'O') {
+            // Jugador O tiene piezas en minúsculas (c, d)
+            esPiezaDelJugador = (piezaActual == 'c' || piezaActual == 'd');
+        }
+        
+        if (!esPiezaDelJugador) {
+            return false; 
+        }
+        
         char nuevaPieza;
-        if (piezaActual == 'C') nuevaPieza = 'D';
-        else if (piezaActual == 'D') nuevaPieza = 'C';
-        else if (piezaActual == 'c') nuevaPieza = 'd';
-        else if (piezaActual == 'd') nuevaPieza = 'c';
-        else return false;
+        switch (piezaActual) {
+            case 'C' -> nuevaPieza = 'D';
+            case 'D' -> nuevaPieza = 'C';
+            case 'c' -> nuevaPieza = 'd';
+            case 'd' -> nuevaPieza = 'c';
+            default -> {
+                return false;
+            }
+        }
         
         tablero[fila][columna] = nuevaPieza;
         return true;
@@ -133,7 +150,7 @@ public class PartidaSimple {
         for (int i = 0; i < 3; i++) {
             for (int lineaFila = 0; lineaFila < 3; lineaFila++) {
                 if (mostrarTitulos && lineaFila == 1) {
-                    char fila = (char)('A' + i);
+                    char fila = convertirFilaALetra(i);
                     System.out.print(fila + "|");
                 } else {
                     System.out.print(" |");
@@ -152,28 +169,29 @@ public class PartidaSimple {
     
     private String obtenerLineaPieza(char pieza, int linea) {
         switch (pieza) {
-            case 'C': 
-                if (linea == 0) return " ●";      
-                if (linea == 1) return "● ";      
-                if (linea == 2) return " ●";      
-                break;
-            case 'c': 
-                if (linea == 0) return " ○";      
-                if (linea == 1) return "○ ";      
-                if (linea == 2) return " ○";      
-                break;
-            case 'D': 
-                if (linea == 0) return "● ";      
-                if (linea == 1) return " ●";      
-                if (linea == 2) return "● ";      
-                break;
-            case 'd': 
-                if (linea == 0) return "○ ";      
-                if (linea == 1) return " ○";      
-                if (linea == 2) return "○ ";      
-                break;
-            default:
+            case 'C' -> {
+                if (linea == 0) return " ●";
+                if (linea == 1) return "● ";
+                if (linea == 2) return " ●";
+            }
+            case 'c' -> {
+                if (linea == 0) return " ○";
+                if (linea == 1) return "○ ";
+                if (linea == 2) return " ○";
+            }
+            case 'D' -> {
+                if (linea == 0) return "● ";
+                if (linea == 1) return " ●";
+                if (linea == 2) return "● ";
+            }
+            case 'd' -> {
+                if (linea == 0) return "○ ";
+                if (linea == 1) return " ○";
+                if (linea == 2) return "○ ";
+            }
+            default -> {
                 return "  ";
+            }
         }
         return "  ";
     }
@@ -182,8 +200,7 @@ public class PartidaSimple {
     
     public boolean verificarGanador() {
         if (verificarTresLetrasAlineadas('O')) return true;
-        if (verificarTresLetrasAlineadas('X')) return true;
-        return false;
+        return verificarTresLetrasAlineadas('X');
     }
     
     public char obtenerGanador() {
@@ -203,12 +220,18 @@ public class PartidaSimple {
     
     private boolean verificarTresLetrasAlineadas(char letraBuscada) {
         posicionesLineaGanadora.clear();
+        boolean estanAlineadas = false;
+        if (verificarAlineacionHorizontalPares(letraBuscada)){
+            estanAlineadas= true;
+        }
+        if (verificarAlineacionVerticalPares(letraBuscada)){
+            estanAlineadas= true;
+        }
+        if( verificarAlineacionDiagonalPares(letraBuscada)){
+            estanAlineadas= true;
+        }
         
-        if (verificarAlineacionHorizontalPares(letraBuscada)) return true;
-        if (verificarAlineacionVerticalPares(letraBuscada)) return true;
-        if (verificarAlineacionDiagonalPares(letraBuscada)) return true;
-        
-        return false;
+        return estanAlineadas;
     }
     
     private boolean verificarAlineacionHorizontalPares(char letraBuscada) {
@@ -297,18 +320,26 @@ public class PartidaSimple {
         for (int i = 0; i < 3; i++) {
             for (int lineaFila = 0; lineaFila < 3; lineaFila++) {
                 if (mostrarTitulos && lineaFila == 1) {
-                    char fila = (char)('A' + i);
+                    char fila = convertirFilaALetra(i);
                     System.out.print(fila + "|");
                 } else {
                     System.out.print(" |");
                 }
                 
                 for (int j = 0; j < 6; j++) {
-                    boolean esPosicionGanadora = esPosicionEnLineaGanadora(i, j);
+                    boolean esPosicionGanadora = false;
+                    int k = 0;
+                    while (k < 6 && !esPosicionGanadora) {
+                        int[] posicion = posicionesLineaGanadora.get(k);
+                        if (posicion[0] == i && posicion[1] == j) {
+                            esPosicionGanadora = true;
+                        }
+                        k++;
+                    }
                     
                     String lineaPieza;
                     if (esPosicionGanadora) {
-                        lineaPieza = obtenerLineaLetraGanadora(letraGanadora, lineaFila);
+                        lineaPieza = obtenerLineaLetraGanadora(letraGanadora);
                     } else {
                         char pieza = tablero[i][j];
                         lineaPieza = obtenerLineaPieza(pieza, lineaFila);
@@ -321,22 +352,12 @@ public class PartidaSimple {
         }
     }
     
-    private boolean esPosicionEnLineaGanadora(int fila, int columna) {
-        for (int[] posicion : posicionesLineaGanadora) {
-            if (posicion[0] == fila && posicion[1] == columna) {
-                return true;
-            }
+    private String obtenerLineaLetraGanadora(char letraGanadora) {
+        String letra = "X ";
+        if (letraGanadora == 'O') {
+            letra = "O ";
         }
-        return false;
-    }
-    
-    private String obtenerLineaLetraGanadora(char letraGanadora, int linea) {
-        if (letraGanadora == 'X') {
-            return "X ";
-        } else if (letraGanadora == 'O') {
-            return "O ";
-        }
-        return "  ";
+        return letra;
     }
     
     // Metodos de partida
@@ -365,6 +386,7 @@ public class PartidaSimple {
             }
             
             char ganador = verificarGanadorYMostrar();
+           
             if (ganador != ' ') {
                 return ganador;
             }
@@ -384,7 +406,7 @@ public class PartidaSimple {
         
         aplicarSecuenciaMovimientos(secuenciaMovimientos);
         
-        System.out.println("\nSecuencia aplicada. Continuando partida...");
+        System.out.println("Secuencia aplicada. Continuando partida...");
         
         while (!juegoTerminado) {
             mostrarTablero();
@@ -453,33 +475,8 @@ public class PartidaSimple {
         char numeroColumna = input.charAt(1);
         char orientacion = input.charAt(2);
         
-        int fila;
-        if (letraFila == 'A') {
-            fila = 0;
-        } else if (letraFila == 'B') {
-            fila = 1;
-        } else if (letraFila == 'C') {
-            fila = 2;
-        } else {
-            fila = -1; // Valor inválido
-        }
-        
-        int columna;
-        if (numeroColumna == '1') {
-            columna = 0;
-        } else if (numeroColumna == '2') {
-            columna = 1;
-        } else if (numeroColumna == '3') {
-            columna = 2;
-        } else if (numeroColumna == '4') {
-            columna = 3;
-        } else if (numeroColumna == '5') {
-            columna = 4;
-        } else if (numeroColumna == '6') {
-            columna = 5;
-        } else {
-            columna = -1; // Valor inválido
-        }
+        int fila = convertirLetraAFila(letraFila);
+        int columna = convertirNumeroAColumna(numeroColumna);
         
         if (fila < 0 || fila > 2 || columna < 0 || columna > 5) {
             if (mostrarMensajes) {
@@ -495,7 +492,7 @@ public class PartidaSimple {
                 }
                 return false;
             }
-            if (invertirPieza(fila, columna)) {
+            if (invertirPieza(fila, columna, getSimbolo(jugadorActual))) {
                 if (mostrarMensajes) {
                     System.out.println("Pieza invertida en " + input.substring(0, 2));
                 }
@@ -639,8 +636,8 @@ public class PartidaSimple {
                             char ganador = obtenerGanador();
                             if (ganador == letraJugadorActual) {
                                 establecerPieza(fila, columna, ' ');
-                                char filaChar = (char)('A' + fila);
-                                char columnaChar = (char)('1' + columna);
+                                char filaChar = convertirFilaALetra(fila);
+                                char columnaChar = convertirColumnaANumero(columna);
                                 return "" + filaChar + columnaChar + "C";
                             }
                         }
@@ -655,8 +652,8 @@ public class PartidaSimple {
                             char ganador = obtenerGanador();
                             if (ganador == letraJugadorActual) {
                                 establecerPieza(fila, columna, ' ');
-                                char filaChar = (char)('A' + fila);
-                                char columnaChar = (char)('1' + columna);
+                                char filaChar = convertirFilaALetra(fila);
+                                char columnaChar = convertirColumnaANumero(columna);
                                 return "" + filaChar + columnaChar + "D";
                             }
                         }
@@ -666,22 +663,64 @@ public class PartidaSimple {
                 
                 // Probar invertir pieza existente
                 if (obtenerPieza(fila, columna) != ' ') {
-                    if (invertirPieza(fila, columna)) {
+                    if (invertirPieza(fila, columna, getSimbolo(jugadorActual))) {
                         if (verificarGanador()) {
                             char ganador = obtenerGanador();
                             if (ganador == letraJugadorActual) {
-                                invertirPieza(fila, columna);
-                                char filaChar = (char)('A' + fila);
-                                char columnaChar = (char)('1' + columna);
+                                invertirPieza(fila, columna, getSimbolo(jugadorActual));
+                                char filaChar = convertirFilaALetra(fila);
+                                char columnaChar = convertirColumnaANumero(columna);
                                 return "" + filaChar + columnaChar + "I";
                             }
                         }
-                        invertirPieza(fila, columna);
+                        invertirPieza(fila, columna, getSimbolo(jugadorActual));
                     }
                 }
             }
         }
         return null;
+    }
+    
+    private char convertirFilaALetra(int fila) {
+        return switch (fila) {
+            case 0 -> 'A';
+            case 1 -> 'B';
+            case 2 -> 'C';
+            default -> 'A';
+        };
+    }
+    
+    private char convertirColumnaANumero(int columna) {
+        return switch (columna) {
+            case 0 -> '1';
+            case 1 -> '2';
+            case 2 -> '3';
+            case 3 -> '4';
+            case 4 -> '5';
+            case 5 -> '6';
+            default -> '1';
+        };
+    }
+    
+    private int convertirLetraAFila(char letra) {
+        return switch (letra) {
+            case 'A' -> 0;
+            case 'B' -> 1;
+            case 'C' -> 2;
+            default -> -1;
+        };
+    }
+    
+    private int convertirNumeroAColumna(char numero) {
+        return switch (numero) {
+            case '1' -> 0;
+            case '2' -> 1;
+            case '3' -> 2;
+            case '4' -> 3;
+            case '5' -> 4;
+            case '6' -> 5;
+            default -> -1;
+        };
     }
     
     private boolean aplicarSecuenciaMovimientos(String secuencia) {
