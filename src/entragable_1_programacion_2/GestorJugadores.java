@@ -10,7 +10,7 @@ public class GestorJugadores {
     private ArrayList<Jugador> jugadores;
     
     public GestorJugadores() {
-        this.jugadores = new ArrayList<Jugador>();
+        this.jugadores = new ArrayList<>();
     }
     
     
@@ -50,7 +50,6 @@ public class GestorJugadores {
                 String nombre2 = jugadoresOrdenados.get(j + 1).getNombre().toLowerCase();
                 
                 if (nombre1.compareTo(nombre2) > 0) {
-                    // Intercambiar posiciones
                     Jugador temp = jugadoresOrdenados.get(j);
                     jugadoresOrdenados.set(j, jugadoresOrdenados.get(j + 1));
                     jugadoresOrdenados.set(j + 1, temp);
@@ -123,7 +122,6 @@ public class GestorJugadores {
                 String nombre2 = invictos.get(j + 1).getNombre().toLowerCase();
                 
                 if (nombre1.compareTo(nombre2) > 0) {
-                    // Intercambiar posiciones
                     Jugador temp = invictos.get(j);
                     invictos.set(j, invictos.get(j + 1));
                     invictos.set(j + 1, temp);

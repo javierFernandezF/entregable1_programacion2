@@ -7,27 +7,26 @@ import java.util.*;
 
 
 public class Sistema {
-    private GestorJugadores gestorJugadores;
-    private Scanner scanner;
     
     public Sistema() {
-        this.gestorJugadores = new GestorJugadores();
-        this.scanner = new Scanner(System.in);
     }
     
     public void iniciar() {
+        GestorJugadores gestorJugadores = new GestorJugadores();
+        Scanner scanner = new Scanner(System.in);
+        
         System.out.println("=== BIENVENIDO A MEDIO TATETI ===");
         
         boolean continuar = true;
         while (continuar) {
             mostrarMenu();
-            int opcion = leerOpcion();
+            int opcion = leerOpcion(scanner);
             
             switch (opcion) {
-                case 1 -> registrarJugador();
-                case 2 -> iniciarPartidaComun();
-                case 3 -> continuarPartida();
-                case 4 -> mostrarRankingEInvictos();
+                case 1 -> registrarJugador(gestorJugadores, scanner);
+                case 2 -> iniciarPartidaComun(gestorJugadores, scanner);
+                case 3 -> continuarPartida(gestorJugadores, scanner);
+                case 4 -> mostrarRankingEInvictos(gestorJugadores);
                 case 0 -> {
                     continuar = false;
                     System.out.println("¡Gracias por jugar Medio Tateti!");
@@ -40,6 +39,7 @@ public class Sistema {
                 scanner.nextLine();
             }
         }
+        scanner.close();
     }
     
     private void mostrarMenu() {
@@ -52,11 +52,10 @@ public class Sistema {
         System.out.println("Seleccione una opción: ");
     }
     
-    private int leerOpcion() {
+    private int leerOpcion(Scanner scanner) {
         String input = scanner.nextLine();
         int opcion;
         
-        // Validar que sea un solo dígito y usar switch case
         if (input.length() == 1) {
             char caracter = input.charAt(0);
             
@@ -75,7 +74,7 @@ public class Sistema {
         return opcion;
     }
     
-    private void registrarJugador() {
+private void registrarJugador(GestorJugadores gestorJugadores, Scanner scanner) {
         System.out.println("\n=== REGISTRAR JUGADOR ===");
         
         System.out.println("Ingrese el nombre del jugador: ");
@@ -105,7 +104,7 @@ public class Sistema {
     }
     
     
-    private void iniciarPartidaComun() {
+private void iniciarPartidaComun(GestorJugadores gestorJugadores, Scanner scanner) {
         System.out.println("\n=== COMIENZO DE PARTIDA COMÚN ===");
         
         if (gestorJugadores.getCantidadJugadores() < 2) {
@@ -117,13 +116,13 @@ public class Sistema {
         gestorJugadores.mostrarListaJugadores();
         
         // Seleccionar jugador 1 (Blanco - O)
-        Jugador jugador1 = seleccionarJugador("Seleccione el jugador 1 (Blanco - O): ");
+        Jugador jugador1 = seleccionarJugador("Seleccione el jugador 1 (Blanco - O): ", gestorJugadores, scanner);
         if (jugador1 == null) return;
         
         // Seleccionar jugador 2 (Negro - X)
         Jugador jugador2;
         do {
-            jugador2 = seleccionarJugador("Seleccione el jugador 2 (Negro - X): ");
+            jugador2 = seleccionarJugador("Seleccione el jugador 2 (Negro - X): ", gestorJugadores, scanner);
             if (jugador2 == null) return;
             
             if (jugador1.getNombre().equals(jugador2.getNombre())) {
@@ -139,10 +138,10 @@ public class Sistema {
         char resultado = juego.iniciarJuego();
         
         // Actualizar estadísticas
-        actualizarEstadisticas(jugador1, jugador2, resultado);
+        actualizarEstadisticas(gestorJugadores, jugador1, jugador2, resultado);
     }
     
-    private void continuarPartida() {
+private void continuarPartida(GestorJugadores gestorJugadores, Scanner scanner) {
         System.out.println("\n=== CONTINUACIÓN DE PARTIDA ===");
         
         if (gestorJugadores.getCantidadJugadores() < 2) {
@@ -154,12 +153,12 @@ public class Sistema {
         gestorJugadores.mostrarListaJugadores();
         
         
-        Jugador jugador1 = seleccionarJugador("Seleccione el jugador 1 (Blanco - O): ");
+        Jugador jugador1 = seleccionarJugador("Seleccione el jugador 1 (Blanco - O): ", gestorJugadores, scanner);
         if (jugador1 == null) return;
         
         Jugador jugador2;
         do {
-            jugador2 = seleccionarJugador("Seleccione el jugador 2 (Negro - X): ");
+            jugador2 = seleccionarJugador("Seleccione el jugador 2 (Negro - X): ", gestorJugadores, scanner);
             if (jugador2 == null) return;
             
             if (jugador1.getNombre().equals(jugador2.getNombre())) {
@@ -184,10 +183,10 @@ public class Sistema {
         char resultado = juego.continuarPartida(secuencia);
         
         // Actualizar estadísticas
-        actualizarEstadisticas(jugador1, jugador2, resultado);
+        actualizarEstadisticas(gestorJugadores, jugador1, jugador2, resultado);
     }
     
-    private Jugador seleccionarJugador(String mensaje) {
+private Jugador seleccionarJugador(String mensaje, GestorJugadores gestorJugadores, Scanner scanner) {
         System.out.print(mensaje);
         String input = scanner.nextLine();
         
@@ -201,7 +200,7 @@ public class Sistema {
         }
     }
     
-    private void actualizarEstadisticas(Jugador jugador1, Jugador jugador2, char resultado) {
+private void actualizarEstadisticas(GestorJugadores gestorJugadores, Jugador jugador1, Jugador jugador2, char resultado) {
         if (resultado == 'O') {
             // Gana jugador1 (Blanco)
             jugador1.incrementarPartidasGanadas();
@@ -213,15 +212,12 @@ public class Sistema {
         }
     }
     
-    private void mostrarRankingEInvictos() {
+private void mostrarRankingEInvictos(GestorJugadores gestorJugadores) {
         System.out.println("\n=== RANKING Y JUGADORES INVICTOS ===");
         
-        // Mostrar ranking
+        
         gestorJugadores.mostrarRanking();
-        
         System.out.println();
-        
-        // Mostrar jugadores invictos
         gestorJugadores.mostrarJugadoresInvictos();
     }
 }
